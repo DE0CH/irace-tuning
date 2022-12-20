@@ -74,7 +74,7 @@ if __name__ == "__main__":
     tconfs = pd.read_csv("confs.csv")
     tconfs["performance"] = ""
     nRuns = 50
-    for i in range(len(tconfs.index))[:2]:
+    for i in range(len(tconfs.index)):
         conf = tconfs.drop([".ID.",".PARENT.","performance"], axis=1).iloc[i,:].to_dict()
         costs = []
         print(f"\nEvaluating {conf}")
