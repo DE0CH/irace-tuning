@@ -98,7 +98,8 @@ def get_imputed_config_as_dict_from_dict(config, cs, impute_with='def'):
             {name:
              config_dict.get(name, cs.get_hyperparameter(name).default_value)
              for name in cs.get_hyperparameter_names()}
-    if type(impute_with) in [int, float, np.float, np.int]:
+    if isinstance(impute_with, int) or isinstance(impute_with, float) \
+        or isinstance(impute_with, np.floating) or isinstance(impute_with, np.integer):
         config_dict = \
             {name:
              config_dict.get(name, impute_with)
