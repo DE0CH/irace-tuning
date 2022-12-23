@@ -143,5 +143,6 @@ defaults = pd.DataFrame(data=dict(
 
 tuner = irace(scenario, params, target_irace)
 best_config = tuner.run()
+tuner.set_initial(defaults)
 
 print(best_config)
