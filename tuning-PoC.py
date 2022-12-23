@@ -135,14 +135,16 @@ scenario = dict(
 
 defaults = pd.DataFrame(data=dict(
     capping = [0],
-    cappingType = ['median'],
-    boundType = ['candidate'], 
-    elitist = [1]
+    cappingType = [np.nan], 
+    boundType = [np.nan], 
+    elitist = [1],
+    testType = ['f-test']
 ))
 
 
 tuner = irace(scenario, params, target_irace)
-best_config = tuner.run()
 tuner.set_initial(defaults)
+best_config = tuner.run()
+
 
 print(best_config)
