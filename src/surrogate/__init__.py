@@ -13,8 +13,9 @@ def convert_params_to_vec(params, cs):
 
     Parameters
     ----------
-    params : list(str)
-        List of parameters in form '--name value' or '-name value'.
+    params : dict
+        Dictionary of parameters where the key is the name and value is the 
+        value.
     cs : ConfigSpace.configuration_space
         Contains the information about the parameters from `params`. Parameter
         in `cs` and `params` must match!
