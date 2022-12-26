@@ -19,16 +19,16 @@ tpoc = importlib.import_module("tuning-PoC")
 #from tpoc import get_instances_training, get_instances_validation, get_instances_meta_validation, predict_surrogate, surrogate_target_runner
 
 # Load the list of instance features
-with open('./target_algorithms/surrogate/cplex_regions200/inst_feat_dict.cplex_regions200.par10.random.json') as f:
+with open('../target_algorithms/surrogate/cplex_regions200/inst_feat_dict.cplex_regions200.par10.random.json') as f:
     instances_features = json.load(f)
 instances = list(instances_features.keys())
 
 # Load the random forest model
 model = regression.binary_rss_forest()
-model.load_from_binary_file('./target_algorithms/surrogate/cplex_regions200/pyrfr_model.cplex_regions200.par10.random.bin')
+model.load_from_binary_file('../target_algorithms/surrogate/cplex_regions200/pyrfr_model.cplex_regions200.par10.random.bin')
 
 # Load parameters as ConfigSpace.ConfigurationSpace
-with open('./target_algorithms/surrogate/cplex_regions200/config_space.cplex_regions200.par10.random.pcs') as f:
+with open('../target_algorithms/surrogate/cplex_regions200/config_space.cplex_regions200.par10.random.pcs') as f:
     cs = pcs.read(f)
 parameters = convert_from_config_space(cs)
 
