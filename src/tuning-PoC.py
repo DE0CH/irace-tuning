@@ -18,6 +18,7 @@ from config import (
     get_instances_validation,
 )
 from models import SurrogateModel
+from config import SurrogateType, default_serializer
 
 threads = cpu_count()
 
@@ -27,7 +28,7 @@ def target_irace(experiment, scenario):
     '''
 
     instance = experiment['instance']
-    model, training_instances, validation_instances, boundMax, maxTime = instance
+    model, training_instances, validation_instances, boundMax, maxTimeOrExperiments, surrogateType = instance
     parameters = convert_from_config_space(model.cs)
 
     def surrogate_target_runner(experiment, scenario):
@@ -35,11 +36,15 @@ def target_irace(experiment, scenario):
         bound = experiment['bound']
         configuration = dict(experiment['configuration'])
         cost = model.predict_surrogate(configuration, instance)
-        return dict(cost=cost, time=min(bound + 1, cost))
+        if surrogateType == SurrogateType.RUNTIME:
+            return dict(cost=cost, time=min(bound + 1, cost))
+        elif surrogateType == SurrogateType.QUALITY:
+            return dict(cost=cost)
+        else:
+            raise NotImplementedError()
   
     scenario = dict(
         instances = training_instances,
-        maxTime = maxTime,
         debugLevel = 0,
         parallel = threads,
         digits = 15,
@@ -47,6 +52,11 @@ def target_irace(experiment, scenario):
         logFile = '', 
         seed = experiment['seed']
     )
+
+    if surrogateType == SurrogateType.RUNTIME:
+        scenario.update(dict(maxTime=maxTimeOrExperiments))
+    elif surrogateType == SurrogateType.QUALITY:
+        scenario.update(dict(maxExperiments=maxTimeOrExperiments))
     
     scenario.update(dict(experiment['configuration']))
 
@@ -90,7 +100,8 @@ scenario = dict(
                 '../target_algorithms/surrogate/cplex_regions200/pyrfr_model.cplex_regions200.par10.random.bin'
             )),
             1000,
-            3600
+            3600,
+            SurrogateType.RUNTIME,
         ),
     ],
     maxExperiments = 2000,
@@ -98,7 +109,8 @@ scenario = dict(
     parallel = 2,
     digits = 15,
     seed = 123,
-    logFile = "log.Rdata"
+    logFile = "log.Rdata",
+    instanceObjectSerializer = default_serializer
     )
 
 defaults = pd.DataFrame(data=dict(

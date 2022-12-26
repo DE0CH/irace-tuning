@@ -1,3 +1,5 @@
+from enum import Enum
+
 def get_instances_training(instances):
     '''Get the training instances for the target irace'''
     return instances[:len(instances) // 3]
@@ -14,3 +16,12 @@ def get_instances_meta_validation(instances):
     '''Get the validation instances for the meta irace'''
     return instances[len(instances) // 3 * 2:]
 
+class SurrogateType(Enum):
+    RUNTIME = 'runtime'
+    QUALITY = 'quality'
+
+def default_serializer(obj):
+    if isinstance(obj, SurrogateType):
+        return obj.value
+    else:
+        return '<not serializable>'
