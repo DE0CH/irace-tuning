@@ -3,6 +3,7 @@ import numpy as np
 from ConfigSpace.util import fix_types, impute_inactive_values
 from ConfigSpace.hyperparameters import NumericalHyperparameter
 
+
 def convert_params_to_vec(params, cs):
     """
     Convert dict - params in list representation to a numerical array
@@ -14,44 +15,42 @@ def convert_params_to_vec(params, cs):
     Parameters
     ----------
     params : dict
-        Dictionary of parameters where the key is the name and value is the 
+        Dictionary of parameters where the key is the name and value is the
         value.
     cs : ConfigSpace.configuration_space
         Contains the information about the parameters from `params`. Parameter
         in `cs` and `params` must match!
-        
+
     Returns
     -------
         np.array
             array representation of the parameters.
     """
-    config = get_imputed_config_from_dict(config=params,
-                                          cs=cs,
-                                          impute_with='def')
+    config = get_imputed_config_from_dict(config=params, cs=cs, impute_with="def")
 
-    config = encode_config_as_array_with_true_values(config=config,
-                                                        cs=cs)
+    config = encode_config_as_array_with_true_values(config=config, cs=cs)
     return config
 
-def get_imputed_config_from_dict(config, cs, impute_with='default'):
+
+def get_imputed_config_from_dict(config, cs, impute_with="default"):
     """
-    Create a configuration from a dictionary. A configuration created with the
-    old configuration space module (2015 from aclib),
-    may contain inactive hyperparameters. Therefore, some preprocessing is
-    necessary.
+        Create a configuration from a dictionary. A configuration created with the
+        old configuration space module (2015 from aclib),
+        may contain inactive hyperparameters. Therefore, some preprocessing is
+        necessary.
 
-    Parameters
-    ----------
-config : dict
-        dictionary representation of a ConfigSpace.Configuration
-    cs : ConfigSpace.ConfigurationSpace
+        Parameters
+        ----------
+    config : dict
+            dictionary representation of a ConfigSpace.Configuration
+        cs : ConfigSpace.ConfigurationSpace
 
-    impute_with : str, optional
-        imputation strategy. Defaults to 'def'
+        impute_with : str, optional
+            imputation strategy. Defaults to 'def'
 
-    Returns
-    -------
-    ConfigSpace.Configuration
+        Returns
+        -------
+        ConfigSpace.Configuration
     """
 
     config_dict = get_imputed_config_as_dict_from_dict(config, cs, impute_with)
@@ -60,19 +59,20 @@ config : dict
     # configuration object. Otherwise a error will be raised.
     # But after creating the configuration, the inactive parameters will be
     # imputed (similar to old config space).
-    config = ConfigSpace.Configuration(configuration_space=cs,
-                              values=config_dict,
-                              allow_inactive_with_values=True)
+    config = ConfigSpace.Configuration(
+        configuration_space=cs, values=config_dict, allow_inactive_with_values=True
+    )
 
     # TODO: These steps are unnecessary! (exact same behaviour like above, but
     #       for dictionaries.
     # make sure it works with new configspace ('def'--> 'default')
-    impute_with = 'default' if impute_with == 'def' else impute_with
+    impute_with = "default" if impute_with == "def" else impute_with
     config = impute_inactive_values(config, impute_with)
 
     return config
 
-def get_imputed_config_as_dict_from_dict(config, cs, impute_with='def'):
+
+def get_imputed_config_as_dict_from_dict(config, cs, impute_with="def"):
     """
     Create a configuration in dictionary representation from a dictionary.
     A configuration created with the old configuration space module
@@ -94,19 +94,24 @@ def get_imputed_config_as_dict_from_dict(config, cs, impute_with='def'):
     """
     config_dict = fix_types(config, cs)
     # include missing (inactive parameters)
-    if impute_with == 'def':
-        config_dict = \
-            {name:
-             config_dict.get(name, cs.get_hyperparameter(name).default_value)
-             for name in cs.get_hyperparameter_names()}
-    if isinstance(impute_with, int) or isinstance(impute_with, float) \
-        or isinstance(impute_with, np.floating) or isinstance(impute_with, np.integer):
-        config_dict = \
-            {name:
-             config_dict.get(name, impute_with)
-             for name in cs.get_hyperparameter_names()}
+    if impute_with == "def":
+        config_dict = {
+            name: config_dict.get(name, cs.get_hyperparameter(name).default_value)
+            for name in cs.get_hyperparameter_names()
+        }
+    if (
+        isinstance(impute_with, int)
+        or isinstance(impute_with, float)
+        or isinstance(impute_with, np.floating)
+        or isinstance(impute_with, np.integer)
+    ):
+        config_dict = {
+            name: config_dict.get(name, impute_with)
+            for name in cs.get_hyperparameter_names()
+        }
 
     return config_dict
+
 
 def encode_config_as_array_with_true_values(config, cs, normalize=False):
     """
@@ -138,10 +143,8 @@ def encode_config_as_array_with_true_values(config, cs, normalize=False):
 
     # This is not necessary for inactive parameter, because for they already
     # default value is used
-    active_hp_names = [name
-                       for name in cs.get_active_hyperparameters(config)]
-    inactive_hp_names = set(cs.get_hyperparameter_names()) \
-                        - set(active_hp_names)
+    active_hp_names = [name for name in cs.get_active_hyperparameters(config)]
+    inactive_hp_names = set(cs.get_hyperparameter_names()) - set(active_hp_names)
 
     for i, hp in enumerate(cs.get_hyperparameters()):
         if hp.name in inactive_hp_names:
